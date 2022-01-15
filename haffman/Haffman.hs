@@ -59,6 +59,9 @@ flattenThreeHelper (MyFilledNode n leftNode rightNode) path = flattenThreeHelper
 
 -- Encode and Decode 
 
+encodeArray:: [Char] -> [(Char, String)] -> [String]
+encodeArray inputText charToString = map ( expandMayBe . (`getByKey` charToString ))  inputText
+
 decodeArray:: [Char] -> MapToChar ->  [Char]
 decodeArray  [] _ = []
 decodeArray array toChar = symbol : decodeArray rest toChar
@@ -71,6 +74,7 @@ decodeArrayhelper array (a:cs) = if isPrefixOf (fst a) array
     else decodeArrayhelper array cs
     where l = length (fst a)
 
+-- Read/Write 
 
 
 haffman :: IO ()
@@ -81,19 +85,18 @@ haffman  = do
             if fileExists
                 then do
                         inputText <- BSC.readFile fileName
-                        let resultList = frequency (unpack inputText)
-                        let mapList = map (uncurry MyNode ) resultList
-                        let tree = buildHaffmanTree mapList
-                        let flatten = flattenThree tree
-                        let reverseFlatten = reversePair flatten
-                        let a = map ( pack . expandMayBe . (`getByKey` flatten )) (unpack inputText)
-                        let result = intercalate (pack "") a;
+                        let frequencyList = frequency (unpack inputText)
+                        let tree = buildHaffmanTree (map (uncurry MyNode ) frequencyList)
 
-                        let b = decodeArray (unpack result) reverseFlatten
-                        print result
-                        print b
+                        let charToString = flattenThree tree
+                        let stringToChar = reversePair charToString
 
+                        let encodedText = encodeArray (unpack inputText) charToString
+                        let encodedTextToOutput = intercalate (pack "") ( map pack encodedText);
 
+                        let decodedText = decodeArray (unpack encodedTextToOutput) stringToChar
+                        print encodedText
+                        print decodedText
 
                         P.putStrLn "End of programm"
                 else do P.putStrLn "The file doesn't exist!"
