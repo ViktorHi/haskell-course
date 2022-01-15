@@ -95,8 +95,13 @@ haffman  = do
                         let encodedTextToOutput = intercalate (pack "") ( map pack encodedText);
 
                         let decodedText = decodeArray (unpack encodedTextToOutput) stringToChar
+                        let decodedTextToOutput = pack decodedText
+
                         print encodedText
                         print decodedText
+
+                        BSC.writeFile "decoded.out" decodedTextToOutput
+                        BSC.writeFile "encoded.out" encodedTextToOutput
 
                         P.putStrLn "End of programm"
                 else do P.putStrLn "The file doesn't exist!"
