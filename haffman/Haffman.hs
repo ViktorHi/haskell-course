@@ -35,6 +35,13 @@ getFrequencyOfNode :: MyTree a  -> Int
 getFrequencyOfNode (MyNode c n ) = n
 getFrequencyOfNode (MyFilledNode n leftNode rightNode) = n
 
+flattenThree :: MyTree a -> [(Char, String)]
+flattenThree a = flattenThreeHelper a ""
+
+flattenThreeHelper :: MyTree a -> String -> [(Char, String)]
+flattenThreeHelper (MyNode c n) path = [(c, path)] 
+flattenThreeHelper (MyFilledNode n leftNode rightNode) path = flattenThreeHelper leftNode (path ++ "0")  ++ flattenThreeHelper rightNode (path ++ "1")
+ 
 haffman :: IO ()
 haffman  = do
             putStr "Enter file name: "
@@ -46,7 +53,8 @@ haffman  = do
                         let resultList = frequency (unpack inputText)
                         let mapList = map (uncurry MyNode ) [('a', 2), ('b', 5), ('c', 7), ('d', 3)]
                         let tree = buildHaffmanTree mapList
-                        print tree
+                        let flatten = flattenThree tree
+                        print flatten
 
 
 
